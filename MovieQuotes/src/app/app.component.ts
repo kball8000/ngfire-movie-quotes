@@ -14,17 +14,13 @@ interface MovieQuote {
 })
 
 export class AppComponent {
-  quoteList: Array<any> = [
-    // {movie: 'Top', quote: 'Great Balls'}, 
-    // {movie: 'Back', quote: 'Doc'}, 
-    // {movie: 'Old', quote: 'School'}
-    ]
+  quoteList: MovieQuote[] = []  // or Array<MovieQuote>
   movieQuote: MovieQuote = {
     movie: '',
     quote: ''
   };
+
   dbQuoteList = firebase.database().ref('/quotes').on('value', (data) => {
-    console.log('data.val()', data.val());
     this.quoteList = data.val();
   });
   editMode: number = -1;
@@ -44,7 +40,8 @@ export class AppComponent {
         this.quoteList.unshift(obj);
       }
       firebase.database().ref('/quotes').set(this.quoteList);
-      // firebase.database().ref().update(this.quoteList);
+      // set is the way to go for arrays. Use int key, 1, 2, 3... if you want an object.
+      // firebase.database().ref().update(this.quoteList);  
     } else {
       obj = this.quoteList[this.editMode];
       obj.movie = this.movieQuote.movie;
