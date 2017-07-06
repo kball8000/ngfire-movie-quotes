@@ -5,6 +5,7 @@ import * as firebase from 'firebase/app';
 interface MovieQuote {
   movie: string;
   quote: string;
+  $key?: string;
 }
 
 @Component({
@@ -14,19 +15,28 @@ interface MovieQuote {
 })
 
 export class AppComponent {
-  quoteList: MovieQuote[] = []  // or Array<MovieQuote>
+
+  readonly quotesPath = '/quotes';
+
+  // This was part of my solution / local only.
+  // quoteList: MovieQuote[]  // or Array<MovieQuote>
+  quoteList: FirebaseListObservable<MovieQuote[]>;
   movieQuote: MovieQuote = {
     movie: '',
     quote: ''
   };
 
-  dbQuoteList = firebase.database().ref('/quotes').on('value', (data) => {
-    this.quoteList = data.val();
-  });
+  // This was my solution, fisher suggested using angularfire2 list feature in the constructor.
+  // dbQuoteList = firebase.database().ref('/quotes').on('value', (data) => {
+  //   this.quoteList = data.val();
+  // });
   editMode: number = -1;
-  constructor(db: AngularFireDatabase) { }
+  constructor(db: AngularFireDatabase) { 
+    this.quoteList = db.list(this.quotesPath)
+  }
 
   addMovieQuote = () => {
+    this.quoteList.push(this.movieQuote);
     let obj;
     if (this.editMode === -1) {
       obj = {
@@ -34,11 +44,11 @@ export class AppComponent {
         quote: this.movieQuote.quote
       }
       console.log('this.quoteList', this.quoteList);
-      if (!this.quoteList) {
-        this.quoteList = [obj];
-      } else {
-        this.quoteList.unshift(obj);
-      }
+      // if (!this.quoteList) {
+      //   this.quoteList = [obj];
+      // } else {
+      //   this.quoteList.unshift(obj);
+      // }
       firebase.database().ref('/quotes').set(this.quoteList);
       // set is the way to go for arrays. Use int key, 1, 2, 3... if you want an object.
       // firebase.database().ref().update(this.quoteList);  
@@ -47,7 +57,7 @@ export class AppComponent {
       obj.movie = this.movieQuote.movie;
       obj.quote = this.movieQuote.quote;
       this.editMode = -1;
-      firebase.database().ref('/quotes').set(this.quoteList);
+      firebase.database().ref(this.quotesPath).set(this.quoteList);
     }
     
     this.movieQuote = {
@@ -60,12 +70,12 @@ export class AppComponent {
       movie: quote.movie,
       quote: quote.quote
     }
-    this.editMode = this.quoteList.indexOf(quote);
+    // this.editMode = this.quoteList.indexOf(quote);
   }
   deleteQuote = (quote) => {
-    let i = this.quoteList.indexOf(quote);
-    this.quoteList.splice(i,1);
-    firebase.database().ref('/quotes').set(this.quoteList);
+    // let i = this.quoteList.indexOf(quote);
+    // this.quoteList.splice(i,1);
+    // firebase.database().ref('/quotes').set(this.quoteList);
   }
 }
 
