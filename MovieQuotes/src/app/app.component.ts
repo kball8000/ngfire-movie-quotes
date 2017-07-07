@@ -23,8 +23,9 @@ export class AppComponent {
   quoteList: FirebaseListObservable<MovieQuote[]>;
   movieQuote: MovieQuote = {
     movie: '',
-    quote: ''
+    quote: '',
   };
+  allList;
 
   // This was my solution, fisher suggested using angularfire2 list feature in the constructor.
   // dbQuoteList = firebase.database().ref('/quotes').on('value', (data) => {
@@ -32,7 +33,19 @@ export class AppComponent {
   // });
   editMode: number = -1;
   constructor(db: AngularFireDatabase) { 
-    this.quoteList = db.list(this.quotesPath)
+    this.quoteList = db.list(this.quotesPath);
+    this.allList = db.list('/');
+  }
+
+  addMovieQuote2 = () => {
+    console.log('movieQuote', this.movieQuote);
+    if (this.movieQuote.$key){
+      console.log('updating quote: ' + this.movieQuote.$key );
+      this.quoteList.update(this.movieQuote.$key, {'movie': this.movieQuote.movie, 'quote': this.movieQuote.quote });
+    } else {
+      console.log('New quote');
+      this.quoteList.push(this.movieQuote);
+    }
   }
 
   addMovieQuote = () => {
@@ -68,7 +81,8 @@ export class AppComponent {
   editQuote = (quote) => {
     this.movieQuote = {
       movie: quote.movie,
-      quote: quote.quote
+      quote: quote.quote,
+      $key: quote.$key
     }
     // this.editMode = this.quoteList.indexOf(quote);
   }
@@ -76,6 +90,11 @@ export class AppComponent {
     // let i = this.quoteList.indexOf(quote);
     // this.quoteList.splice(i,1);
     // firebase.database().ref('/quotes').set(this.quoteList);
+  }
+  logQuoteKey = (el, key) => {
+    console.log(el + 'key is: ', key);
+    (el === 'obj') ? ( console.log('exists: ' + key.$exists()) ) : ( console.log('not obj') );
+    // (el === 'obj') ? ( console.log('value: ' + key.$value) ) : ( console.log('not obj') );
   }
 }
 
