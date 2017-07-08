@@ -23,7 +23,9 @@
         <!--<label for="quote">Quote</label>  -->
         <input required type='text' placeholder="Quote" class="form-control" id='quote' name='quote' [(ngModel)]="movieQuote.quote">
       </div>
-      <button class='btn btn-default pull-right' type='submit' [disabled]='!movieQuoteForm.valid' >Submit</button>
+      <button class='btn btn-default pull-right' type='submit' [disabled]='!movieQuoteForm.valid' >
+        {{movieQuote.$key ? 'Edit' : 'Submit' }}
+      </button>
       <div class="clearfix"></div>
     </form>
   </div>
@@ -35,12 +37,25 @@
       <tr>
         <th>Movie</th>
         <th>Quote</th>
+        <th>Edit</th>
       </tr>
       <tr *ngFor='let quote of quoteList | async | reverse'>
         <td>{{quote.movie}}</td>
-        <td>{{quote.quote}} <button (click)='logQuoteKey("obj", quote)'>Q</button>
-                            <button (click)='logQuoteKey("key", quote.$key)'>K</button> 
-                            <button (click)='editQuote(quote)'>E</button> </td>
+        <td>{{quote.quote}}</td>
+        <td> 
+          <button type='button' class='btn btn-primary btn-xs' (click)='logQuoteKey("obj", quote)'>
+            <span class='glyphicon glyphicon-envelope' aria-hidden="true"></span>
+          </button>
+          <button type='button' class='btn btn-default btn-xs' (click)='logQuoteKey("key", quote.$key)'>
+            <span class='glyphicon glyphicon-wrench' aria-hidden="true"></span>
+          </button>
+          <button type='button' class='btn btn-success btn-xs' (click)='editQuote(quote)'>
+            <span class='glyphicon glyphicon-edit' aria-hidden="true"></span>
+          </button> 
+          <button type='button' class='btn btn-warning btn-xs' (click)='deleteQuote(quote)'>
+            <span class='glyphicon glyphicon-trash' aria-hidden="true"></span>
+          </button> 
+        </td>
       </tr>
     </table>
     <ul>

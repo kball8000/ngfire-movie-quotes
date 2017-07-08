@@ -40,12 +40,17 @@ export class AppComponent {
   addMovieQuote2 = () => {
     console.log('movieQuote', this.movieQuote);
     if (this.movieQuote.$key){
-      console.log('updating quote: ' + this.movieQuote.$key );
+      console.log('updating quote, quote key: ', this.movieQuote.$key );
+      console.log('updating quote, quote obj: ', this.movieQuote );
       this.quoteList.update(this.movieQuote.$key, {'movie': this.movieQuote.movie, 'quote': this.movieQuote.quote });
+      // this.quoteList.update(this.movieQuote.$key, this.movieQuote);
     } else {
       console.log('New quote');
       this.quoteList.push(this.movieQuote);
     }
+    this.movieQuote.movie = '';
+    this.movieQuote.quote = '';
+    this.movieQuote.$key = '';
   }
 
   addMovieQuote = () => {
@@ -79,6 +84,9 @@ export class AppComponent {
     }
   }
   editQuote = (quote) => {
+    // this.movieQuote = quote;
+    // this.movieQuote = { ...quote }; // Does not copy over the $key prop... sort of cool.
+    console.log('editmoviequote: ', this.movieQuote );
     this.movieQuote = {
       movie: quote.movie,
       quote: quote.quote,
@@ -87,9 +95,8 @@ export class AppComponent {
     // this.editMode = this.quoteList.indexOf(quote);
   }
   deleteQuote = (quote) => {
-    // let i = this.quoteList.indexOf(quote);
-    // this.quoteList.splice(i,1);
-    // firebase.database().ref('/quotes').set(this.quoteList);
+    this.quoteList.remove(quote.$key);
+    // this.quoteList.remove('blar');
   }
   logQuoteKey = (el, key) => {
     console.log(el + 'key is: ', key);
